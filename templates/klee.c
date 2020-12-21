@@ -1,3 +1,5 @@
+#include "klee/klee.h"
+
 int main(int argc, char** argv) {
     {%
         for {<type>}, {<var>}, {<size>} in {<vp>}:

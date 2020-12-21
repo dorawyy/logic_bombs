@@ -37,6 +37,19 @@ def ATKrun(target, func_name='logic_bomb', default_stdin_len=10, maxtime=60, sou
             return res
 
     cmds_tp, tp_path, prefix, src_dirs = target
+    """
+    for klee: 
+    
+    cmds_tp = cmds_tp_klee = [
+    "clang -Iinclude -Lbuild -Wno-unused-parameter -emit-llvm -o klee/%s.bc -c -g klee/a.c -lpthread -lutils -lcrypto -lm",
+    "klee --libc=uclibc --posix-runtime klee/%s.bc",
+    "python3 script/klee_run.py -e%d -p%s"]
+
+    tp_path = klee_tp_path = 'templates/klee.c'
+
+    prefix = 'klee'
+    src_dirs = ('src/', )
+    """
     if folder:
         src_dirs = (folder, )
     if not os.path.exists(prefix):
@@ -132,7 +145,16 @@ def ATKrun(target, func_name='logic_bomb', default_stdin_len=10, maxtime=60, sou
                     cmds.append(cmds_tp[0] % outname)
                     cmds.append(cmds_tp[1] % outname)
                     cmds.append(cmds_tp[2] % (2, outname))
+                    """
+                    cmds = [
+                        "clang -Iinclude -Lbuild -Wno-unused-parameter -emit-llvm -o klee/%s.bc -c -g klee/a.c -lpthread -lutils -lcrypto -lm",
+                        "klee --libc=uclibc --posix-runtime klee/%s.bc",
+                        "python3 script/klee_run.py -e%d -p%s"
+                    ]
+                    """
+                    print('klee command is ......: ', cmds)
                     p = subprocess.Popen(cmds[0].split(' '), stdin=subprocess.PIPE)
+                    print('now run clang command.........')
                     p.communicate(res.encode('utf8'))
                     cp_value = p.wait()
                     if cp_value:
@@ -141,15 +163,18 @@ def ATKrun(target, func_name='logic_bomb', default_stdin_len=10, maxtime=60, sou
                         continue
                     try:
                         p = subprocess.Popen(cmds[1].split(' '), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                        print('now run klee command.........')
                         errored = False
                         out, err = p.communicate(timeout=MAX_TIME)
                         rt_vale = p.wait(timeout=MAX_TIME)
                     except subprocess.TimeoutExpired:
+                        print('now timeout command.........')
                         test_results[fp] = TLE
                         kill_all(p)
                         continue
 
                     p = subprocess.Popen(cmds[2].split(' '))
+                    print('now run python command.........')
                     try:
                         rt_vale = p.wait(timeout=MAX_TIME)
                         test_results[fp] = rt_vale

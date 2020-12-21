@@ -1,5 +1,10 @@
+import os
+os.environ['LD_LIBRARY_PATH'] = '/home/klee/klee_build/lib/:$LD_LIBRARY_PATH'
+lib_path = '/home/klee/klee_build/lib/'
+
 # ============ run_tests Setting ==============
 FUNC_NAME = 'logic_bomb'
+
 
 cmds_tp_angr = ["clang -Iinclude -Lbuild -o angr/%s.out -xc - -lutils -lpthread -lcrypto -lm",
             "python script/angr_run.py -r -l%d angr/%s.out"]
@@ -8,7 +13,8 @@ cmds_tp_angr_cpp = ["clang++ -Iinclude -Lbuild -o angr/%s.out -xc++ - -lutils -l
             "python script/angr_run.py -r -l%d angr/%s.out"]
 
 cmds_tp_klee = [
-    "clang -Iinclude -Lbuild -Wno-unused-parameter -emit-llvm -o klee/%s.bc -c -g klee/a.c -lpthread -lutils -lcrypto -lm",
+    #"clang -Iinclude -Lbuild -Wno-unused-parameter -emit-llvm -o klee/%s.bc -c -g klee/a.c -lpthread -lutils -lcrypto -lm",
+    "clang -Iinclude -I/home/klee/klee_src/include -L/home/klee/klee_build/lib/ -Llib -Wno-unused-parameter -emit-llvm -o klee/%s.bc -c -g klee/a.c -lpthread -lutils -lcrypto -lm",
     "klee --libc=uclibc --posix-runtime klee/%s.bc",
     "python3 script/klee_run.py -e%d -p%s"
 ]
