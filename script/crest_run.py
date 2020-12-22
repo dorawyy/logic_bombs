@@ -17,7 +17,6 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-e", "--expected", type=int, help="Expected amount of results")
 parser.add_argument("-p", "--program", type=str, help="Binary program")
 args = parser.parse_args()
-print ('args is: ...', args)
 print(colored('[+] Compiling ...', 'green'))
 
 # cmd = 'clang -Iinclude -L ' + lib_path + ' -Lbuild -o klee/a.out klee/a.c -lkleeRuntest -lpthread -lutils -lcrypto -lm'

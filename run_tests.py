@@ -202,6 +202,57 @@ def ATKrun(target, func_name='logic_bomb', default_stdin_len=10, maxtime=60, sou
                     rt_vale = p.wait()
                     test_results[fp] = rt_vale
 
+
+                # yingying wrote
+                elif prefix == 'crest':
+                    if not os.path.exists('crest'):
+                        os.mkdir('crest')
+
+                    with open('crest/a.c', 'w') as f:
+                        f.write(res)
+
+                    cmds.append(cmds_tp[0] % outname)
+                    cmds.append(cmds_tp[1] % outname)
+                    cmds.append(cmds_tp[2] % (2, outname))
+                    """
+                    cmds_tp_crest = [
+                         "mkdir crest/out_%s && cd crest/out_%s && cp ../a.c %s.c && sudo crestc ../a.c &> out_crestc_%s.txt",
+                        "sudo run_crest a 100 -cfg &> out_runcrest_%s.txt && cd ../",
+                        "python3 script/crest_run.py -e%d -p%s"
+]
+                    """
+                    print('crest command is ......: ', cmds)
+                    p = subprocess.Popen(cmds[0].split(' '), stdin=subprocess.PIPE, stderr=subprocess.PIPE)
+                    print('now run crestc command.........')
+                    p.communicate(res.encode('utf8'))
+                    cp_value = p.wait()
+                    if cp_value:
+                        print('test_results[fp] is ...', test_results[fp])
+                        test_results[fp] = COMPILE_ERROR
+                        print('========= Compile Error! ==========')
+                        continue
+                    try:
+                        p = subprocess.Popen(cmds[1].split(' '), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                        print('now run run_crest command.........')
+                        errored = False
+                        out, err = p.communicate(timeout=MAX_TIME)
+                        rt_vale = p.wait(timeout=MAX_TIME)
+                    except subprocess.TimeoutExpired:
+                        print('now timeout command.........')
+                        test_results[fp] = TLE
+                        kill_all(p)
+                        continue
+
+                    p = subprocess.Popen(cmds[2].split(' '))
+                    print('now run python command.........')
+                    try:
+                        rt_vale = p.wait(timeout=MAX_TIME)
+                        test_results[fp] = rt_vale
+                    except subprocess.TimeoutExpired:
+                        test_results[fp] = TLE
+                        kill_all(p)
+                    shutil.rmtree('crest')
+
     return test_results
 
 

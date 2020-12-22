@@ -29,9 +29,17 @@ cmds_tp_triton_cpp = [
     "python script/triton_caller.py -l%d -m%d -f%s -i%s -p triton/%s.out"
 ]
 
+
+cmds_tp_crest = [
+    "mkdir crest/out_%s && cd crest/out_%s && cp ../a.c %s.c && sudo crestc ../a.c &> out_crestc_%s.txt",
+    "sudo run_crest a 100 -cfg &> out_runcrest_%s.txt && cd ../",
+    "python3 script/crest_run.py -e%d -p%s"
+]
+
 angr_tp_path = 'templates/default_no_printf.c'
 triton_tp_path = 'templates/default_no_printf.c'
 klee_tp_path = 'templates/klee.c'
+crest_tp_path = 'templates/crest.c'
 
 switches = {
     'angr': [cmds_tp_angr, angr_tp_path, 'angr', ('src/', )],
@@ -39,6 +47,7 @@ switches = {
     'triton': [cmds_tp_triton, triton_tp_path, 'triton', ('src/', )],
     'triton_cpp': [cmds_tp_triton_cpp, triton_tp_path, 'triton', ('src_cpp/', )],
     'klee': [cmds_tp_klee, klee_tp_path, 'klee', ('src/', )],
+    'crest': [cmds_tp_crest, crest_tp_path, 'crest', ('src/', )],
 }
 
 # ============ triton Setting ==============
